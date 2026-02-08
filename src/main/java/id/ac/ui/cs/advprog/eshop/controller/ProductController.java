@@ -35,4 +35,22 @@ public class ProductController {
         model.addAttribute("products", allProducts);
         return "productList";
     }
+
+    @GetMapping("/edit")
+    public String updateProductPage(@RequestParam(name="id") String id, Model model) {
+        try {
+            Product product = service.findById(id);
+            model.addAttribute("product", product);
+            return "editProduct";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "editProduct";
+        }
+    }
+
+    @PostMapping("/edit")
+    public String editProductPost(@ModelAttribute Product product, Model model) {
+        service.update(product);
+        return "redirect:list";
+    }
 }
