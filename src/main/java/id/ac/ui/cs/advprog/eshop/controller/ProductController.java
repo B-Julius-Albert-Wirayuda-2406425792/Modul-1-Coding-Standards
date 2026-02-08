@@ -53,4 +53,17 @@ public class ProductController {
         service.update(product);
         return "redirect:list";
     }
+
+    @GetMapping("/delete/{id}")
+    public String deleteProductPost(@PathVariable String id, Model model) {
+        try {
+            Product product = service.findById(id);
+            model.addAttribute("product", product);
+            service.delete(product);
+            return "redirect:/product/list";
+        } catch (IllegalArgumentException e){
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/product/list";
+        }
+    }
 }
