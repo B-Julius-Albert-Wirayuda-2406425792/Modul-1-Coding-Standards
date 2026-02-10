@@ -1,14 +1,10 @@
 # eshop
 
----
-
 Julius Albert Wirayuda \
 2406425792 \
 ADPRO B
 
 ## Reflection 1
-
----
 
 After re-evaluating my source code and the coding standards that I've learned, here is my analysis of my current implementation and improvement recommendations.
 
@@ -37,8 +33,6 @@ After re-evaluating my source code and the coding standards that I've learned, h
     There is no validation for user input before saving to the repository. The use of Spring's `@Valid` and Bean Validation (JSR 303) is recommended in the controller to ensure data integrity before it reaches the service layer.
 
 ## Reflection 2
-
----
 
 ### Unit Testing
 After writing the unit test, I feel more confident in the robustness of the code. Unit tests act as a safety net, ensuring that the core logic works as intended and preventing future changes from introducing regressions.
