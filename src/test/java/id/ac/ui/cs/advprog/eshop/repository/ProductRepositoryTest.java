@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Iterator;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -130,5 +131,55 @@ class ProductRepositoryTest {
         Product savedProduct = productIterator.next();
         assertEquals(product.getProductId(), savedProduct.getProductId());
         assertEquals(product.getProductName(), savedProduct.getProductName());
+    }
+
+    @Test
+    void testCreate_generatesUuidWhenProductIdBlank() {
+        Product product = new Product();
+        product.setProductId("");
+        product.setProductName("Auto ID Product");
+        product.setProductQuantity(1);
+
+        Product created = productRepository.create(product);
+
+        assertNotNull(created.getProductId());
+        assertFalse(created.getProductId().isBlank());
+
+        assertDoesNotThrow(() -> UUID.fromString(created.getProductId()));
+    }
+
+    @Test
+    void testFindById_throwsWhenNotFound_andMessageMatches() {
+        String missingId = "missing-id";
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> productRepository.findById(missingId)
+        );
+
+        assertEquals("Product with Id + " + missingId + " was not found.", ex.getMessage());
+    }
+
+    @Test
+    void testUpdate_throwsWhenUpdatedProductNull() {
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> productRepository.update(null)
+        );
+        assertEquals("Product and Product Id must not be null.", ex.getMessage());
+    }
+
+    @Test
+    void testUpdate_throwsWhenProductIdNull() {
+        Product updated = new Product();
+        updated.setProductId(null);
+        updated.setProductName("X");
+        updated.setProductQuantity(1);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> productRepository.update(updated)
+        );
+        assertEquals("Product and Product Id must not be null.", ex.getMessage());
     }
 }
