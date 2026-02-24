@@ -62,3 +62,21 @@ Copying the instance variables (`serverPort`, `testBaseUrl`, `baseUrl`) and the 
 
 **Suggested Improvement** \
 To make the code cleaner, I suggest creating a **Base Test Class** (e.g., `BaseFunctionalTest`) that encapsulates the common setup logic.
+
+## Reflection Module 02
+
+### Code Quality Issues and Fix Strategy
+
+**Issue A: Sonarqube couldn't detect test coverage (JaCoCo XML report missing**
+- **What I fixed**: I configured JaCoCo to generate an XML coverage report so SonarQube can read it (in tasks.jacocoTestReport inside build.gradle.kts).
+- **My strategy**: Make quality signals automatic and machine-readable. I kept coverage generation inside the Gradle lifecycle (tests finalize into the report task), so coverage is always produced consistently in CI.
+
+**Issue B: Dependencies weren’t verified (supply-chain risk)**
+- **What I fixed**: I added Gradle Dependency Verification metadata to validate dependency integrity via checksums/keys in verification-metadata.xml (supported by the keyring files like verification-keyring.gpg / verification-keyring.keys).
+- **My strategy**: Reduce “works on my machine” and security uncertainty by making dependency resolution fail fast if artifacts change unexpectedly.
+
+### CI/CD Workflows: Does this meet Continuous Integration and Continuous Deployment?
+
+In my opinion, this project meets Continuous Integration (CI) because GitHub Actions automatically runs unit tests on every push and pull request using ci.yml. It also runs build and analysis (SonarQube) on pull requests and pushes to master via build.yml, which helps ensure new code is validated before/when it gets merged.
+
+I also consider this project meets Continuous Deployment (CD), even though the deployment isn’t implemented inside GitHub Actions. My deployment is configured directly in Koyeb to automatically build and deploy from the repository whenever there is a push/PR update to master, and it uses the container build defined in Dockerfile. So the deployment step is still fully automated and happens continuously after changes land in master, just managed by Koyeb rather than a GitHub workflow.
