@@ -43,8 +43,7 @@ public class ProductController {
             model.addAttribute("product", product);
             return "editProduct";
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            return "editProduct";
+            return "redirect:list";
         }
     }
 
