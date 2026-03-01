@@ -39,25 +39,34 @@ public class ProductController {
         return "ProductList";
     }
 
-    @GetMapping("/edit/{productId}")
-    public String editProductPage(@PathVariable String productId, Model model) {
-        Product product = service.findById(productId);
-        model.addAttribute("product", product);
-        return "EditProduct";
+    @GetMapping("/edit")
+    public String updateProductPage(@RequestParam(name="id") String id, Model model){
+        try {
+            Product product = service.findById(id);
+            model.addAttribute("product", product);
+            return "EditProduct";
+        } catch (IllegalArgumentException e) {
+            return "redirect:list";
+        }
     }
 
     @PostMapping("/edit")
-    public String editProductPost(@ModelAttribute Product product, Model model) {
-        System.out.println(product.getProductId());
+    public String editProductPost(@ModelAttribute Product product, Model model){
         service.update(product);
-
         return "redirect:list";
     }
 
-    @PostMapping("/delete")
-    public String deleteProduct(@RequestParam("productId") String productId) {
-        service.delete(service.findById(productId));
-        return "redirect:list";
+    @GetMapping("/delete/{id}")
+    public String deleteProductPost(@PathVariable String id, Model model){
+        try {
+            Product product = service.findById(id);
+            model.addAttribute("product", product);
+            service.delete(product);
+            return "redirect:/product/list";
+        } catch (IllegalArgumentException e){
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/product/list";
+        }
     }
 }
 
