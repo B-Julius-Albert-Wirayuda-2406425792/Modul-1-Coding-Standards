@@ -49,7 +49,7 @@ class ProductControllerTest {
     void getCreate_returnsCreateView_andHasProductModel() throws Exception {
         mockMvc.perform(get("/product/create"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("createProduct"))
+                .andExpect(view().name("CreateProduct"))
                 .andExpect(model().attributeExists("product"));
 
         verifyNoInteractions(service);
@@ -74,7 +74,7 @@ class ProductControllerTest {
 
         mockMvc.perform(get("/product/list"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("productList"))
+                .andExpect(view().name("ProductList"))
                 .andExpect(model().attributeExists("products"));
 
         verify(service, times(1)).findAll();
@@ -87,7 +87,7 @@ class ProductControllerTest {
 
         mockMvc.perform(get("/product/edit").param("id", "id-1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("editProduct"))
+                .andExpect(view().name("EditProduct"))
                 .andExpect(model().attributeExists("product"));
 
         verify(service, times(1)).findById("id-1");
