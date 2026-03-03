@@ -80,3 +80,79 @@ To make the code cleaner, I suggest creating a **Base Test Class** (e.g., `BaseF
 In my opinion, this project meets Continuous Integration (CI) because GitHub Actions automatically runs unit tests on every push and pull request using ci.yml. It also runs build and analysis (SonarQube) on pull requests and pushes to master via build.yml, which helps ensure new code is validated before/when it gets merged.
 
 I also consider this project meets Continuous Deployment (CD), even though the deployment isn’t implemented inside GitHub Actions. My deployment is configured directly in Koyeb to automatically build and deploy from the repository whenever there is a push/PR update to master, and it uses the container build defined in Dockerfile. So the deployment step is still fully automated and happens continuously after changes land in master, just managed by Koyeb rather than a GitHub workflow.
+
+## Reflection 3 — Applying SOLID Principles in the E-Shop Project
+
+In this project, I tried to apply **SOLID** so the codebase is easier to maintain as features grow.
+
+### 1) SOLID principles applied in this project
+
+#### **S — Single Responsibility Principle (SRP)**
+I separate responsibilities by feature/domain:
+- `ProductService` handles product logic only.
+- `OrderService` handles order flow only.
+- `PaymentService` handles payment processing only.
+
+So, each class has one clear reason to change.
+
+#### **O — Open/Closed Principle (OCP)**
+I design payment and shipping features to be extended without editing core checkout logic.
+- Example: adding a new payment type (e.g., bank transfer) by creating a new implementation, not rewriting `CheckoutService`.
+
+#### **L — Liskov Substitution Principle (LSP)**
+Implementations can replace their parent abstraction safely.
+- Example: any class implementing `PaymentMethod` can be used by checkout without breaking behavior.
+
+#### **I — Interface Segregation Principle (ISP)**
+I avoid “fat” interfaces by splitting contracts by use case.
+- Example: admin product management and customer product browsing use different interfaces, so classes only implement what they need.
+
+#### **D — Dependency Inversion Principle (DIP)**
+High-level modules depend on abstractions, not concrete classes.
+- Example: `CheckoutService` depends on `IPaymentGateway` and `IOrderRepository`, so infrastructure details can be swapped easily.
+
+---
+
+### 2) Advantages of applying SOLID (with examples)
+
+1. **Code is easier to maintain**
+    - If tax calculation changes, I update tax-related logic only, not the whole checkout flow.
+
+2. **Features are easier to extend**
+    - New payment gateway can be added as a new class implementing `IPaymentGateway`.
+
+3. **Testing becomes simpler**
+    - Services that depend on interfaces can use mocks in unit tests.
+    - Example: test `CheckoutService` with a fake payment gateway, without real external API calls.
+
+4. **Lower risk when refactoring**
+    - Since responsibilities are separated, changing one part is less likely to break unrelated parts.
+
+5. **Better teamwork**
+    - Different team members can work on catalog, order, and payment modules in parallel with fewer merge conflicts.
+
+---
+
+### 3) Disadvantages of NOT applying SOLID (with examples)
+
+1. **Tightly coupled code**
+    - If checkout directly creates a specific payment class, replacing that provider requires editing many files.
+
+2. **Large “god classes”**
+    - One class handling product, order, payment, and notification becomes hard to read and debug.
+
+3. **Hard to test**
+    - Without abstractions, logic is mixed with database/API calls, so unit tests become slow and brittle.
+
+4. **Frequent side effects**
+    - Small changes can break unrelated features because everything is connected in one place.
+
+5. **Slower development over time**
+    - At first it may feel faster, but as the project grows, every new feature needs risky modifications to old code.
+
+---
+
+### Conclusion
+
+Applying SOLID in this e-shop project helps me build a cleaner architecture that is easier to scale, test, and maintain.  
+Without SOLID, development may look faster in the short term, but technical debt increases and slows down future iterations.
