@@ -54,7 +54,7 @@ class CarController {
 
     @PostMapping("/deleteCar")
     public String deleteCar(@RequestParam("carId") String carId) {
-        service.deleteCarById(carId);
+        service.deleteById(carId);
         return "redirect:listCar";
     }
 }

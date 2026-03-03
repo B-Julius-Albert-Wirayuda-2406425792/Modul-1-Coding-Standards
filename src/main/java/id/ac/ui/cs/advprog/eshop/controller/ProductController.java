@@ -50,7 +50,7 @@ public class ProductController {
 
     @PostMapping("/edit")
     public String editProductPost(@ModelAttribute Product product, Model model){
-        service.update(product);
+        service.update(product.getProductId(), product);
         return "redirect:list";
     }
 
@@ -58,7 +58,7 @@ public class ProductController {
     public String deleteProductPost(@PathVariable String id, Model model){
         try {
             Product product = service.findById(id);
-            service.delete(product);
+            service.deleteById(id);
             return "redirect:/product/list";
         } catch (IllegalArgumentException e) {
             return "redirect:/product/list";
