@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class Product {
-    private String productId;
+public class Product implements IdHolder {
+    private String id;
     private String productName;
     private int productQuantity;
 }

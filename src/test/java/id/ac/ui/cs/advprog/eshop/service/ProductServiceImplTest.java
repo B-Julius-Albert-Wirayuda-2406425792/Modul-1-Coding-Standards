@@ -27,7 +27,7 @@ class ProductServiceImplTest {
     @Test
     void create_delegatesToRepository_andReturnsProduct() {
         Product p = new Product();
-        p.setProductId("id-1");
+        p.setId("id-1");
         p.setProductName("A");
         p.setProductQuantity(10);
 
@@ -41,10 +41,8 @@ class ProductServiceImplTest {
 
     @Test
     void findAll_collectsIteratorIntoList() {
-        Product p1 = new Product();
-        p1.setProductId("1");
-        Product p2 = new Product();
-        p2.setProductId("2");
+        Product p1 = new Product(); p1.setId("1");
+        Product p2 = new Product(); p2.setId("2");
 
         Iterator<Product> it = Arrays.asList(p1, p2).iterator();
         when(productRepository.findAll()).thenReturn(it);
@@ -52,15 +50,15 @@ class ProductServiceImplTest {
         List<Product> result = service.findAll();
 
         assertEquals(2, result.size());
-        assertEquals("1", result.get(0).getProductId());
-        assertEquals("2", result.get(1).getProductId());
+        assertEquals("1", result.get(0).getId());
+        assertEquals("2", result.get(1).getId());
         verify(productRepository, times(1)).findAll();
     }
 
     @Test
     void findById_delegatesToRepository() {
         Product p = new Product();
-        p.setProductId("x");
+        p.setId("x");
         when(productRepository.findById("x")).thenReturn(p);
 
         Product result = service.findById("x");
@@ -72,22 +70,16 @@ class ProductServiceImplTest {
     @Test
     void update_delegatesToRepository() {
         Product p = new Product();
-        p.setProductId("x");
-        when(productRepository.update(p)).thenReturn(p);
+        p.setId("x");
 
-        Product result = service.update(p);
+        service.update("x", p);
 
-        assertSame(p, result);
-        verify(productRepository, times(1)).update(p);
+        verify(productRepository, times(1)).update("x", p);
     }
 
     @Test
-    void delete_delegatesToRepository() {
-        Product p = new Product();
-        p.setProductId("x");
-
-        service.delete(p);
-
-        verify(productRepository, times(1)).delete(p);
+    void deleteById_delegatesToRepository() {
+        service.deleteById("x");
+        verify(productRepository, times(1)).delete("x");
     }
 }
