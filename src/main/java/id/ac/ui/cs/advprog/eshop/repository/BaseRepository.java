@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.eshop.repository;
 
-import id.ac.ui.cs.advprog.eshop.model.Car;
 import id.ac.ui.cs.advprog.eshop.model.IdHolder;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public abstract class BaseRepository<T extends IdHolder> {
         return entity;
     }
 
-    public Iterator<T> findAll(String id) {
+    public Iterator<T> findAll() {
         return data.iterator();
     }
 

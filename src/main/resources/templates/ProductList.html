@@ -24,8 +24,8 @@
             <td th:text="${product.productName}"></td>
             <td th:text="${product.productQuantity}"></td>
             <td>
-                <a th:href="@{/product/edit(id=${product.productId})}" class = "btn btn-warning btn-sm">Edit</a>
-                <form th:action="@{/product/delete/{id}(id=${product.productId})}" method="post" style="display:inline">
+                <a th:href="@{/product/edit(id=${product.id})}" class = "btn btn-warning btn-sm">Edit</a>
+                <form th:action="@{/product/delete/{id}(id=${product.id})}" method="post" style="display:inline">
                     <button type="submit"
                             class="btn btn-danger btn-sm"
                             onclick="return confirm('Are you sure you want to delete this product?')">
