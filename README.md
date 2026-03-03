@@ -81,78 +81,52 @@ In my opinion, this project meets Continuous Integration (CI) because GitHub Act
 
 I also consider this project meets Continuous Deployment (CD), even though the deployment isn’t implemented inside GitHub Actions. My deployment is configured directly in Koyeb to automatically build and deploy from the repository whenever there is a push/PR update to master, and it uses the container build defined in Dockerfile. So the deployment step is still fully automated and happens continuously after changes land in master, just managed by Koyeb rather than a GitHub workflow.
 
-## Reflection 3 — Applying SOLID Principles in the E-Shop Project
+## Reflection 3
 
-In this project, I tried to apply **SOLID** so the codebase is easier to maintain as features grow.
-
-### 1) SOLID principles applied in this project
-
-#### **S — Single Responsibility Principle (SRP)**
-I separate responsibilities by feature/domain:
-- `ProductService` handles product logic only.
-- `OrderService` handles order flow only.
-- `PaymentService` handles payment processing only.
-
-So, each class has one clear reason to change.
-
-#### **O — Open/Closed Principle (OCP)**
-I design payment and shipping features to be extended without editing core checkout logic.
-- Example: adding a new payment type (e.g., bank transfer) by creating a new implementation, not rewriting `CheckoutService`.
-
-#### **L — Liskov Substitution Principle (LSP)**
-Implementations can replace their parent abstraction safely.
-- Example: any class implementing `PaymentMethod` can be used by checkout without breaking behavior.
-
-#### **I — Interface Segregation Principle (ISP)**
-I avoid “fat” interfaces by splitting contracts by use case.
-- Example: admin product management and customer product browsing use different interfaces, so classes only implement what they need.
-
-#### **D — Dependency Inversion Principle (DIP)**
-High-level modules depend on abstractions, not concrete classes.
-- Example: `CheckoutService` depends on `IPaymentGateway` and `IOrderRepository`, so infrastructure details can be swapped easily.
+In this module, I have applied the SOLID principles to improve the maintainability, scalability, and readability of the e-shop codebase. Below is an explanation of the principles applied and the impact they have on the project.
 
 ---
 
-### 2) Advantages of applying SOLID (with examples)
+### 1) SOLID Principles Applied
 
-1. **Code is easier to maintain**
-    - If tax calculation changes, I update tax-related logic only, not the whole checkout flow.
+#### **Single Responsibility Principle (SRP)**
+SRP states that a class should have only one reason to change. I have implemented this by separating the controllers for `Product` and `Car`. Initially, they might have been mixed, but now:
+- `ProductController` only handles HTTP requests related to `Product`.
+- `CarController` only handles HTTP requests related to `Car`.
+- Business logic is delegated to their respective service layers (`ProductService`, `CarService`), and data persistence is handled by the repositories.
 
-2. **Features are easier to extend**
-    - New payment gateway can be added as a new class implementing `IPaymentGateway`.
+#### **Open/Closed Principle (OCP)**
+OCP states that software entities should be open for extension but closed for modification. I applied this by creating a `BaseRepository<T>` and `IdHolder` interface.
+- If I want to add a new model (e.g., `Category`), I don't need to modify the core logic of how repositories save or find items. I can simply create a `CategoryRepository` that extends `BaseRepository<Category>`. The base behavior is reused and extended through inheritance without modifying the base class code.
 
-3. **Testing becomes simpler**
-    - Services that depend on interfaces can use mocks in unit tests.
-    - Example: test `CheckoutService` with a fake payment gateway, without real external API calls.
+#### **Liskov Substitution Principle (LSP)**
+LSP states that objects of a superclass should be replaceable with objects of its subclasses without affecting the correctness of the program.
+- In my implementation, `ProductRepository` and `CarRepository` both extend `BaseRepository`. They override the `update` method because the specific fields to update (like `productName` vs `carColor`) differ. However, they maintain the contract of the base class. Any part of the system expecting a `BaseRepository` can work with either subclass correctly because they both follow the expected behavior of managing entities with IDs.
 
-4. **Lower risk when refactoring**
-    - Since responsibilities are separated, changing one part is less likely to break unrelated parts.
+#### **Interface Segregation Principle (ISP)**
+ISP recommends breaking down large interfaces into smaller, more specific ones.
+- I have split the service interfaces into `ReadService<T>` and `WriteService<T>`.
+- Instead of one massive `Service` interface, `ProductService` and `CarService` inherit from these smaller interfaces. This allows potential future clients that only need to read data (like a dashboard) to depend only on `ReadService` without being forced to know about creation or deletion methods.
 
-5. **Better teamwork**
-    - Different team members can work on catalog, order, and payment modules in parallel with fewer merge conflicts.
-
----
-
-### 3) Disadvantages of NOT applying SOLID (with examples)
-
-1. **Tightly coupled code**
-    - If checkout directly creates a specific payment class, replacing that provider requires editing many files.
-
-2. **Large “god classes”**
-    - One class handling product, order, payment, and notification becomes hard to read and debug.
-
-3. **Hard to test**
-    - Without abstractions, logic is mixed with database/API calls, so unit tests become slow and brittle.
-
-4. **Frequent side effects**
-    - Small changes can break unrelated features because everything is connected in one place.
-
-5. **Slower development over time**
-    - At first it may feel faster, but as the project grows, every new feature needs risky modifications to old code.
+#### **Dependency Inversion Principle (DIP)**
+DIP recommends that high-level modules should not depend on low-level modules; both should depend on abstractions.
+- My controllers (e.g., `ProductController`) depend on the interface `ProductService`, not the concrete implementation `ProductServiceImpl`.
+- This makes the code more flexible. For instance, if I decide to change how products are managed (e.g., using an external API instead of a local repository), I can create a new implementation of `ProductService` and swap it in the Spring configuration without changing the controller's code.
 
 ---
 
-### Conclusion
+### 2) Advantages of Applying SOLID Principles
 
-Applying SOLID in this e-shop project helps me build a cleaner architecture that is easier to scale, test, and maintain.  
-Without SOLID, development may look faster in the short term, but technical debt increases and slows down future iterations.
+1.  **Easier Maintenance and Readability**: By following SRP, classes are smaller and focused. For example, if there's a bug in how cars are updated, I know exactly that the issue is in `CarRepository` or `CarService`, and I won't accidentally break Product logic.
+2.  **Scalability**: Thanks to OCP and DIP, adding new features is easy. If I want to add a `Customer` module, I can follow the existing pattern of `BaseRepository` and `BaseService` interfaces without touching the existing `Product` or `Car` code.
+3.  **Better Testability**: Because of DIP, I can easily mock the `ProductService` when writing unit tests for `ProductController`. I don't need a real database or repository to test the navigation logic in the controller.
+4.  **Reduced Side Effects**: With LSP, I can be confident that substituting a subclass won't break the system. This makes refactoring much safer.
+
+---
+
+### 3) Disadvantages of NOT Applying SOLID Principles
+
+1.  **Rigid Code (Tightly Coupled)**: Without DIP, if `ProductController` was directly instantiated with `ProductServiceImpl`, changing the service implementation would require modifying the controller. In a large project, this leads to a "ripple effect" where one change breaks many files.
+2.  **God Classes**: Without SRP, we might end up with one `EshopController` handling Products, Cars, Users, and Orders. This file would become thousands of lines long, making it extremely difficult for a team to work on simultaneously due to merge conflicts.
+3.  **Code Duplication**: Without OCP and inheritance (like `BaseRepository`), I would have to copy-paste the `create`, `delete`, and `findById` logic into every single repository. If I found a bug in the `delete` logic, I would have to fix it in five different places.
+4.  **Fragility**: Without ISP, a client that only needs to list products would still be affected if I changed the signature of the `delete` method, even though that client never uses it. This leads to unnecessary recompilations and potential bugs.
