@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -30,16 +29,12 @@ class ProductControllerTest {
     @BeforeEach
     void setUp() {
         ProductController controller = new ProductController(service);
-        ReflectionTestUtils.setField(controller, "service", service);
-
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     private static Product product(String id, String name, int qty) {
         Product p = new Product();
-        p.setProductId(id);
+        p.setId(id);
         p.setProductName(name);
         p.setProductQuantity(qty);
         return p;
@@ -51,14 +46,13 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("CreateProduct"))
                 .andExpect(model().attributeExists("product"));
-
         verifyNoInteractions(service);
     }
 
     @Test
     void postCreate_redirectsToList_andCallsServiceCreate() throws Exception {
         mockMvc.perform(post("/product/create")
-                        .param("productId", "id-1")
+                        .param("id", "id-1")
                         .param("productName", "N")
                         .param("productQuantity", "10"))
                 .andExpect(status().is3xxRedirection())
@@ -109,40 +103,39 @@ class ProductControllerTest {
     @Test
     void postEdit_redirectsToList_andCallsUpdate() throws Exception {
         mockMvc.perform(post("/product/edit")
-                        .param("productId", "id-1")
+                        .param("id", "id-1")
                         .param("productName", "B")
                         .param("productQuantity", "2"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("list"));
 
-        verify(service, times(1)).update(any(Product.class));
+        verify(service, times(1)).update(eq("id-1"), any(Product.class));
         verifyNoMoreInteractions(service);
     }
 
     @Test
-    void getDelete_success_redirectsToProductList_andCallsDelete() throws Exception {
-        Product p = product("id-1", "A", 1);
-        when(service.findById("id-1")).thenReturn(p);
+    void postDelete_success_redirectsToProductList_andCallsDeleteById() throws Exception {
+        when(service.findById("id-1")).thenReturn(product("id-1", "A", 1));
 
-        mockMvc.perform(get("/product/delete/id-1"))
+        mockMvc.perform(post("/product/delete/id-1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/product/list"));
 
         verify(service, times(1)).findById("id-1");
-        verify(service, times(1)).delete(p);
+        verify(service, times(1)).deleteById("id-1");
         verifyNoMoreInteractions(service);
     }
 
     @Test
-    void getDelete_notFound_redirectsToProductList_andDoesNotDelete() throws Exception {
+    void postDelete_notFound_redirectsToProductList_andDoesNotDelete() throws Exception {
         when(service.findById("missing")).thenThrow(new IllegalArgumentException("not found"));
 
-        mockMvc.perform(get("/product/delete/missing"))
+        mockMvc.perform(post("/product/delete/missing"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/product/list"));
 
         verify(service, times(1)).findById("missing");
-        verify(service, never()).delete(any(Product.class));
+        verify(service, never()).deleteById(anyString());
         verifyNoMoreInteractions(service);
     }
 }

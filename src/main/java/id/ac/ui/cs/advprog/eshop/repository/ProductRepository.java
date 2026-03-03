@@ -10,11 +10,11 @@ public class ProductRepository extends BaseRepository<Product> {
             throw new IllegalArgumentException("Product and Product Id must not be null.");
         }
 
-        Product currentProduct = findById(id);
-
-        if (!currentProduct.getId().equals(id)) {
+        if (!updatedProduct.getId().equals(id)) {
             throw new IllegalArgumentException("Product and Id must match");
         }
+
+        Product currentProduct = findById(id);
 
         currentProduct.setProductName(updatedProduct.getProductName());
         currentProduct.setProductQuantity(updatedProduct.getProductQuantity());
