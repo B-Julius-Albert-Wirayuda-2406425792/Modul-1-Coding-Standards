@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class Car {
-    private String carId;
+public class Car implements IdHolder {
+    private String id;
     private String carName;
     private String carColor;
     private int carQuantity;
