@@ -29,7 +29,7 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        ProductController controller = new ProductController();
+        ProductController controller = new ProductController(service);
         ReflectionTestUtils.setField(controller, "service", service);
 
         mockMvc = MockMvcBuilders

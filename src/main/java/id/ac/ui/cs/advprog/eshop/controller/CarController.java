@@ -1,8 +1,9 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Car;
-import id.ac.ui.cs.advprog.eshop.service.CarServiceImpl;
+import id.ac.ui.cs.advprog.eshop.service.CarService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +13,11 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/car")
+@RequiredArgsConstructor
 class CarController {
 
     @Autowired
-    private CarServiceImpl carservice;
+    private final CarService service;
 
     @GetMapping("/createCar")
     public String createCarPage(Model model) {
@@ -26,20 +28,20 @@ class CarController {
 
     @PostMapping("/createCar")
     public String createCarPost(@ModelAttribute Car car, Model model){
-        carservice.create(car);
+        service.create(car);
         return "redirect:listCar";
     }
 
     @GetMapping("/listCar")
     public String carListPage(Model model){
-        List<Car> allCars = carservice.findAll();
+        List<Car> allCars = service.findAll();
         model.addAttribute("cars", allCars);
         return "CarList";
     }
 
     @GetMapping("/editCar/{carId}")
     public String editCarPage(@PathVariable String carId, Model model) {
-        Car car = carservice.findById(carId);
+        Car car = service.findById(carId);
         model.addAttribute("car", car);
         return "EditCar";
     }
@@ -47,14 +49,14 @@ class CarController {
     @PostMapping("/editCar")
     public String editCarPost(@ModelAttribute Car car, Model model) {
         System.out.println(car.getCarId());
-        carservice.update(car.getCarId(), car);
+        service.update(car.getCarId(), car);
 
         return "redirect:listCar";
     }
 
     @PostMapping("/deleteCar")
     public String deleteCar(@RequestParam("carId") String carId) {
-        carservice.deleteCarById(carId);
+        service.deleteCarById(carId);
         return "redirect:listCar";
     }
 }
