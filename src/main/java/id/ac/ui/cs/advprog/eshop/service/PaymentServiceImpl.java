@@ -32,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         Payment payment = new Payment(UUID.randomUUID().toString(), method, status, paymentData, order);
+        this.setStatus(payment, status);
         return paymentRepository.save(payment);
     }
 

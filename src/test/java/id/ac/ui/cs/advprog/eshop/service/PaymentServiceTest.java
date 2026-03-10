@@ -52,6 +52,7 @@ class PaymentServiceTest {
         
         assertNotNull(result);
         assertEquals("SUCCESS", result.getStatus());
+        assertEquals("SUCCESS", order.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
@@ -66,6 +67,7 @@ class PaymentServiceTest {
         
         assertNotNull(result);
         assertEquals("REJECTED", result.getStatus());
+        assertEquals("FAILED", order.getStatus());
     }
 
     @Test
