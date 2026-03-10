@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.util.Map;
 
+/**
+ * Represents a payment for an order in the e-shop.
+ */
 @Getter
 public class Payment {
     String id;
