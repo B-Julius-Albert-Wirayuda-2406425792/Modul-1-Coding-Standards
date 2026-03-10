@@ -130,3 +130,20 @@ DIP recommends that high-level modules should not depend on low-level modules; b
 2.  **God Classes**: Without SRP, we might end up with one `EshopController` handling Products, Cars, Users, and Orders. This file would become thousands of lines long, making it extremely difficult for a team to work on simultaneously due to merge conflicts.
 3.  **Code Duplication**: Without OCP and inheritance (like `BaseRepository`), I would have to copy-paste the `create`, `delete`, and `findById` logic into every single repository. If I found a bug in the `delete` logic, I would have to fix it in five different places.
 4.  **Fragility**: Without ISP, a client that only needs to list products would still be affected if I changed the signature of the `delete` method, even though that client never uses it. This leads to unnecessary recompilations and potential bugs.
+
+## Reflection 4
+
+Based on Percival's (2017) principles for evaluating testing objectives, I believe the Test-Driven Development (TDD) flow I followed is useful but could be further optimized.
+
+1.  **Is the TDD flow useful?** Yes, it is. By writing tests before implementation, I was forced to think clearly about the requirements and the interface of my methods (like `update` and `delete`) before writing the actual code. This prevented over-engineering and ensured that every line of code was justified by a requirement.
+2.  **What to do next time?** To improve my TDD flow, I need to focus more on the **Refactor** phase of the Red-Green-Refactor cycle. While I successfully reached the "Green" state, I sometimes moved on to the next feature too quickly without thoroughly checking if the code could be made cleaner or more efficient. Next time, I will dedicate more time to identifying code smells immediately after a test passes, rather than waiting for a separate refactoring session.
+
+After reviewing my unit tests (such as `ProductRepositoryTest`), I have evaluated them against the **F.I.R.S.T.** principle:
+
+*   **Fast**: The tests run very quickly because they only test logic in memory and use Mockito to isolate dependencies.
+*   **Independent**: Each test case (e.g., `testEditProduct` and `testDeleteProduct`) is independent. They do not rely on the state left by previous tests because I use a fresh `ProductRepository` instance for each test.
+*   **Repeatable**: The tests are deterministic. Whether I run them locally or in the CI pipeline, the results are consistent because they don't depend on external factors like a real database or network.
+*   **Self-Validating**: Each test has clear assertions (`assertEquals`, `assertTrue`, `assertThrows`) that automatically determine if the test passed or failed without requiring manual inspection of logs.
+*   **Timely**: In the TDD workflow, the tests were written just before the production code was implemented, satisfying the "Timely" aspect.
+
+Overall, I believe my tests have successfully followed the F.I.R.S.T. principle. For future tests, I will continue to maintain this standard, specifically ensuring that even as the project grows and becomes more complex, the "Independent" and "Fast" qualities are not compromised by shared state or heavy external dependencies.
