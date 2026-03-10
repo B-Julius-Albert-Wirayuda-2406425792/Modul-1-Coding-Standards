@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository for managing Payment entities.
+ */
 @Repository
 public class PaymentRepository {
     private List<Payment> paymentData = new ArrayList<>();
