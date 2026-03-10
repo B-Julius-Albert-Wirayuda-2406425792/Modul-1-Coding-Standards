@@ -26,15 +26,19 @@ public class PaymentServiceImpl implements PaymentService {
                 status = "REJECTED";
             }
         } else if (method.equals("BANK_TRANSFER")) {
-            String bankName = paymentData.get("bankName");
-            String referenceCode = paymentData.get("referenceCode");
-            if (bankName == null || bankName.isEmpty() || referenceCode == null || referenceCode.isEmpty()) {
+            if (!isValidBankTransfer(paymentData)) {
                 status = "REJECTED";
             }
         }
 
         Payment payment = new Payment(UUID.randomUUID().toString(), method, status, paymentData, order);
         return paymentRepository.save(payment);
+    }
+
+    private boolean isValidBankTransfer(Map<String, String> paymentData) {
+        String bankName = paymentData.get("bankName");
+        String referenceCode = paymentData.get("referenceCode");
+        return bankName != null && !bankName.isEmpty() && referenceCode != null && !referenceCode.isEmpty();
     }
 
     private boolean isValidVoucher(String voucherCode) {
